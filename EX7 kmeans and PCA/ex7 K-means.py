@@ -4,6 +4,10 @@ from scipy.io import loadmat
 import matplotlib.pyplot as plt
 import time
 
+# used in func < kmeans_in_photo_compressing() >
+from skimage import io
+from sklearn.cluster import KMeans
+
 def calc_EucDistance(vec1, vec2):
     return np.linalg.norm(vec1 - vec2)
     
@@ -69,12 +73,24 @@ def choose_best_group_number(X):
         
     plt.plot(range(2, 10), loss)
     plt.show()
+
+def kmeans_in_photo_compressing():
+    pic = io.imread('data/bird_small.bmp') / 255
+    data = pic.reshape(128*128, 3)
+    model = KMeans(n_clusters=16, n_init=100) # 24bit 压缩为16bit
+    model.fit(data)
+    centroids = model.cluster_centers_
+    C = model.predict(data)
+    compresed_pic = centroids[C].reshape((128, 128, 3))
     
-mat1 = loadmat('data/ex7data1.mat')
-mat2 = loadmat('data/ex7data2.mat')
-
-data1 = pd.DataFrame(mat1.get('X'), columns=['X1', 'X2'])
+    fig, ax = plt.subplots(1, 2)
+    ax[0].imshow(pic)
+    ax[1].imshow(compresed_pic)
+    plt.show()
+    
+    
+mat2 = loadmat('data/ex7data1.mat')
 data2 = np.array(pd.DataFrame(mat2.get('X'), columns=['X1', 'X2']))
-choose_best_group_number(data2)
-
+#choose_best_group_number(data2)
+#kmeans_in_photo_compressing()
 
